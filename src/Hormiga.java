@@ -14,10 +14,12 @@ public abstract class Hormiga extends Thread {
     };
 
     //Constructor
-    public Hormiga(String id, TipoHormiga tipo, Posicion posicion) {
+    public Hormiga(String id, TipoHormiga tipo, Posicion posicion, Random random, boolean activa) {
         this.id = id;
         this.tipo = tipo;
         this.posicion = posicion;
+        this.random = new Random();
+        this.activa = true;
     }
 
     /*
