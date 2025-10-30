@@ -1,8 +1,8 @@
 import java.util.HashMap;
 
 public class Mapa {
-    public static final int ANCHO = 7;
-    public static final int ALTO = 5;
+    public static final int ANCHO = 8;
+    public static final int ALTO = 7;
     private final Posicion hormiguero;
     private final char[][] mapa;
     public static final char VACIO = '*';

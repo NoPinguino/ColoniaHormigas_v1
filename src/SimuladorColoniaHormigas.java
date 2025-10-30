@@ -128,14 +128,13 @@ public class SimuladorColoniaHormigas {
 
     /**
      * Método que imprime las estadisticas de la colonia de hormigas.
+     * Big O(n) n=cantidad de hormigas
      */
     public void mostrarEstadisticas() {
         int hormigas_activas = 0;
-        for (Hormiga hormiga : hormigas.values()) {
-            if (hormiga.isActiva()) hormigas_activas++;
-        }
         int hormigas_obreras = 0;
         for (Hormiga hormiga : hormigas.values()) {
+            if (hormiga.isActiva()) hormigas_activas++;
             if (hormiga.getTipo() == TipoHormiga.OBRERA) hormigas_obreras++;
         }
 
