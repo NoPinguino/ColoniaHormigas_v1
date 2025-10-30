@@ -1,6 +1,7 @@
 import java.util.Random;
 
 public abstract class Hormiga extends Thread {
+    private static final int INTERVALO_MAX = 3000;
     protected final String id;
     protected final TipoHormiga tipo;
     protected volatile Posicion posicion;
@@ -12,12 +13,14 @@ public abstract class Hormiga extends Thread {
             {0,-1}, //Izquierda
             {-1,0}  //Arriba
     };
+    private final SimuladorColoniaHormigas simuladorColoniaHormigas;
 
     //Constructor
-    public Hormiga(String id, TipoHormiga tipo, Posicion posicion, Random random, boolean activa) {
+    public Hormiga(String id, TipoHormiga tipo, Posicion posicion, SimuladorColoniaHormigas simuladorColoniaHormigas) {
         this.id = id;
         this.tipo = tipo;
         this.posicion = posicion;
+        this.simuladorColoniaHormigas = simuladorColoniaHormigas;
         this.random = new Random();
         this.activa = true;
     }
@@ -49,11 +52,29 @@ public abstract class Hormiga extends Thread {
      public boolean isActiva() {
         return activa;
      }
+
     /**
      * Establece el valor de activa a 'false', deteniendo su ejecución.
      * Big O(1)
      */
     public void detener() {
         activa = false;
-     }
+    }
+
+    /**
+     *
+     *
+     */
+    @Override
+    public void run() {
+       while (this.activa) {
+           try {
+               this.simuladorColoniaHormigas.moverHormigaAleatoriamente(this);
+               Thread.sleep(random.nextInt(INTERVALO_MAX));
+           } catch (InterruptedException e) {
+               Thread.currentThread().interrupt(); //Paro el hilo si me da error.
+               break;
+           }
+       }
+    }
 }

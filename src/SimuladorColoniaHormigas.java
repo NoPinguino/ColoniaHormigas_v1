@@ -18,7 +18,7 @@ public class SimuladorColoniaHormigas {
     /*
     Asigno los valores iniciales en el propio constructor.
      */
-    public SimuladorColoniaHormigas(Random random, Mapa mapa, HashMap<String, Hormiga> hormigas, boolean simulacionActiva) {
+    public SimuladorColoniaHormigas() {
         this.random = new Random();
         this.mapa = new Mapa();
         this.hormigas = new HashMap<>();
@@ -40,8 +40,9 @@ public class SimuladorColoniaHormigas {
                 Creo una nueva HormigaObrera con un id y una Posicion (la posicion es la generada anteriormente)
                  */
                 String idHormiga = "Hormiga_" + hormigas_agregadas;
-                HormigaObrera obrera = new HormigaObrera(idHormiga, intentoHormiga);
+                HormigaObrera obrera = new HormigaObrera(idHormiga, intentoHormiga, this);
                 this.hormigas.put(idHormiga,obrera);
+                obrera.start();
             }
         }
     }
@@ -78,20 +79,11 @@ public class SimuladorColoniaHormigas {
      * Imprime el estado actual del mapa, actualizando primero el propio mapa.
      * Big O(n) n=cantidad de hormigas
      */
-    private void actualizarVisualizacion() {
+    public void actualizarVisualizacion() {
         limpiarConsola();
         this.mapa.prepararMapa(this.hormigas); //repararMapa() recibe String->id_hormiga y Hormiga->objHormigaObrera
         this.mapa.mostrarMapa();
-    }
-
-    /**
-     * Método que recorre el mapa hormigas, pasando cada hormiga indivialmente a moverHormigaAleatoriamente()
-     * Big O(n)
-     */
-    private synchronized void moverTodasLasHormigas() {
-        for (Hormiga hormiga : this.hormigas.values()) {
-            moverHormigaAleatoriamente(hormiga);
-        }
+        mostrarEstadisticas();
     }
 
     /**
@@ -99,12 +91,12 @@ public class SimuladorColoniaHormigas {
      * Big O(?) depende de números aleatorios, no para hasta generar una posición válida.
      * @param hormiga Instancia de la clase hormiga
      */
-    private synchronized void moverHormigaAleatoriamente(Hormiga hormiga) {
+    public synchronized void moverHormigaAleatoriamente(Hormiga hormiga) {
         boolean movimiento_posible = false;
         while (!movimiento_posible) {
             int direccion = this.random.nextInt(4); //Genera un número entre 0-3
-            int deltaX = DIRECCIONES[direccion][0]; // En DIRECCIONES[][] el elemento[n][0] corresponde a movimiento en eje Y
-            int deltaY = DIRECCIONES[direccion][1]; // En DIRECCIONES[][] el elemento[n][1] corresponde a movimiento en eje X
+            int deltaY = DIRECCIONES[direccion][0]; // En DIRECCIONES[][] el elemento[n][0] corresponde a movimiento en eje X
+            int deltaX = DIRECCIONES[direccion][1]; // En DIRECCIONES[][] el elemento[n][1] corresponde a movimiento en eje Y
 
             Posicion posicion = hormiga.getPosicion();
             Posicion nuevaPosicion = posicion.mover(deltaX, deltaY);
@@ -128,7 +120,7 @@ public class SimuladorColoniaHormigas {
      * Este método imprime 10 saltos e linea, ayudando a leer fácilmente la terminal.
      * Big O(n) n=cantidad de lineas en blanco
      */
-    private void limpiarConsola() {
+    public void limpiarConsola() {
         for (int i = 0; i < 10; i++) {
             System.out.println();
         }
@@ -137,7 +129,7 @@ public class SimuladorColoniaHormigas {
     /**
      * Método que imprime las estadisticas de la colonia de hormigas.
      */
-    private void mostrarEstadisticas() {
+    public void mostrarEstadisticas() {
         int hormigas_activas = 0;
         for (Hormiga hormiga : hormigas.values()) {
             if (hormiga.isActiva()) hormigas_activas++;

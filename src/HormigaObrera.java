@@ -4,7 +4,7 @@ public class HormigaObrera extends Hormiga{
      * @param id Atributo id heredado de Hormiga
      * @param posicionInicial Atributo PosicionInicial heredado de Hormiga
      */
-    public HormigaObrera(String id, Posicion posicionInicial) {
-        super(id, TipoHormiga.OBRERA, posicionInicial);
+    public HormigaObrera(String id, Posicion posicionInicial, SimuladorColoniaHormigas simuladorColoniaHormigas) {
+        super(id, TipoHormiga.OBRERA, posicionInicial, simuladorColoniaHormigas);
     }
 }

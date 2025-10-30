@@ -17,8 +17,8 @@ public class Mapa {
         /*
         Relleno el mapa con caracteres que representan el espacio vacío, en este caso '*':
          */
-        for (int i = 0; i < ANCHO; i++) {
-            for (int j = 0; j < ALTO; j++) {
+        for (int i = 0; i < ALTO; i++) {
+            for (int j = 0; j < ANCHO; j++) {
                 mapa[i][j] = VACIO;
             }
         }
@@ -26,8 +26,8 @@ public class Mapa {
         En caso de que el tablero sea par el hormiguero se sitúa en la esquina superior izquierda
         del centro exacto.
          */
-        hormiguero = new Posicion(ANCHO/2, ALTO/2); //Guardamos la posición para usarla más adelante.
-        this.mapa[hormiguero.getX()][hormiguero.getY()] = HORMIGUERO; //Dibujamos el hormiguero.
+        hormiguero = new Posicion(ANCHO / 2, ALTO / 2); //Guardamos la posición para usarla más adelante.
+        this.mapa[hormiguero.getY()][hormiguero.getX()] = HORMIGUERO; //Dibujamos el hormiguero.
     }
 
     /**
@@ -45,7 +45,7 @@ public class Mapa {
      * @return Devuelve lo que recibe de posicion.dentroLimites(), siendo un boolean true/false.
      */
     public boolean dentroLimites(Posicion posicion) {
-        return posicion.dentroLimites(ANCHO,ALTO);
+        return posicion.dentroLimites(ANCHO - 1,ALTO - 1);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Mapa {
     public synchronized void mostrarMapa() {
         for (int i = 0; i < ALTO; i++) {
             for (int j = 0; j < ANCHO; j++) {
-                System.out.println(this.mapa[i][j] + " ");
+                System.out.print(this.mapa[i][j] + " ");
             }
             System.out.println(); //Salto de linea
         }
@@ -63,8 +63,10 @@ public class Mapa {
         Imprimo en consola una pequeña leyenda con los iconos de Hormiguero y HormigaObrera, siendo que son
         los únicos añadidos por el momento en el mapa en esta versión.
          */
-        System.out.println("Hormiguero: " + hormiguero);
+        System.out.println();
+        System.out.println("Hormiguero: " + HORMIGUERO);
         System.out.println("Hormiga obrera: " + TipoHormiga.OBRERA.getSimbolo());
+        System.out.println();
     }
 
     /**
@@ -76,17 +78,20 @@ public class Mapa {
         /*
         Volvemos a asignar vació al mapa entero como hicimos antes, y volvemos a colocar el hormiguero en el centro.
          */
-        for (int i = 0; i < ANCHO; i++) {
-            for (int j = 0; j < ALTO; j++) {
+        for (int i = 0; i < ALTO; i++) {
+            for (int j = 0; j < ANCHO; j++) {
                 mapa[i][j] = VACIO;
             }
         }
-        this.mapa[hormiguero.getX()][hormiguero.getY()] = HORMIGUERO;
+        this.mapa[hormiguero.getY()][hormiguero.getX()] = HORMIGUERO;
         /*
         Recorro el HashMap de hormigas colocándolas en el mapa en el proceso.
          */
         for (Hormiga hormiga : hormigas.values()) {
-            mapa[hormiga.getPosicion().getY()][hormiga.getPosicion().getX()] = hormiga.getTipo().getSimbolo().charAt(0);
+            int posX = hormiga.getPosicion().getX();
+            int posY = hormiga.getPosicion().getY();
+
+            mapa[posY][posX] = hormiga.getTipo().getSimbolo().charAt(0);
         }
     }
 }
