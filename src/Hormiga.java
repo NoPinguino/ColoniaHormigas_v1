@@ -62,8 +62,8 @@ public abstract class Hormiga extends Thread {
     }
 
     /**
-     *
-     *
+     * Método run de los hilos, gestiona el flujo de los hilos individualmente.
+     * Big O(?) depende de números aleatorios, potencialmente infinito.
      */
     @Override
     public void run() {
