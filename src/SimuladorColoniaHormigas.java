@@ -32,9 +32,10 @@ public class SimuladorColoniaHormigas {
     public void generarHormigaObrera() {
         int hormigas_agregadas = 0;
         Posicion posicionHormiguero = mapa.getHormiguero();
+
         while (hormigas_agregadas < NUMERO_OBRERAS) {
             Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
-            if (intentoHormiga.getX() != posicionHormiguero.getX() && intentoHormiga.getY() != posicionHormiguero.getY()) {
+            if (intentoHormiga.getX() != posicionHormiguero.getX() && intentoHormiga.getY() != posicionHormiguero.getY()) { //Distinta posición al hormiguero
                 hormigas_agregadas += 1; //El intento es exitoso así que aumento las hormigas agregadas.
                 /*
                 Creo una nueva HormigaObrera con un id y una Posicion (la posicion es la generada anteriormente)
@@ -42,7 +43,7 @@ public class SimuladorColoniaHormigas {
                 String idHormiga = "Hormiga_" + hormigas_agregadas;
                 HormigaObrera obrera = new HormigaObrera(idHormiga, intentoHormiga, this);
                 this.hormigas.put(idHormiga,obrera);
-                obrera.start();
+                obrera.start(); //Se inicia el hilo en la clase Hormiga
             }
         }
     }
@@ -98,8 +99,8 @@ public class SimuladorColoniaHormigas {
             int deltaY = DIRECCIONES[direccion][0]; // En DIRECCIONES[][] el elemento[n][0] corresponde a movimiento en eje X
             int deltaX = DIRECCIONES[direccion][1]; // En DIRECCIONES[][] el elemento[n][1] corresponde a movimiento en eje Y
 
-            Posicion posicion = hormiga.getPosicion();
-            Posicion nuevaPosicion = posicion.mover(deltaX, deltaY);
+            Posicion posicion = hormiga.getPosicion(); // Posición actual de la hormiga.
+            Posicion nuevaPosicion = posicion.mover(deltaX, deltaY); // Pasamos las deltas a la función mover para generar nueva posición.
 
             /*
             Comprueba que las coordenadas se encuentren en los límites del tablero llamando a dentroLimites()

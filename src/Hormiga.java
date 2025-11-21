@@ -1,18 +1,12 @@
 import java.util.Random;
 
 public abstract class Hormiga extends Thread {
-    private static final int INTERVALO_MAX = 3000;
+    private static final int INTERVALO_MAX = 2000;
     protected final String id;
     protected final TipoHormiga tipo;
     protected volatile Posicion posicion;
     protected volatile boolean activa;
     protected final Random random;
-    protected static final int[][] direcciones = {
-            {0,1},  //Derecha
-            {1,0},  //Abajo
-            {0,-1}, //Izquierda
-            {-1,0}  //Arriba
-    };
     private final SimuladorColoniaHormigas simuladorColoniaHormigas;
 
     //Constructor
