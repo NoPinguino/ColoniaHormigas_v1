@@ -3,6 +3,7 @@ import java.util.Random;
 
 public class SimuladorColoniaHormigas {
     private static final int NUMERO_OBRERAS = 3;
+    private static final int NUMERO_TRABAJADORAS = 2;
     private static final int INTERVALO_ACTUALIZACION = 1500;
     private static final int[][] DIRECCIONES = {
             {1,0},  //Abajo
@@ -30,20 +31,32 @@ public class SimuladorColoniaHormigas {
      * Big O(?) no estoy seguro de la complejidad, ya que depende de números aleatorios.
      */
     public void generarHormigaObrera() {
-        int hormigas_agregadas = 0;
         Posicion posicionHormiguero = mapa.getHormiguero();
 
-        while (hormigas_agregadas < NUMERO_OBRERAS) {
+        int hormigasObreras_agregadas = 0;
+        while (hormigasObreras_agregadas < NUMERO_OBRERAS) {
             Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
             if (intentoHormiga.getX() != posicionHormiguero.getX() && intentoHormiga.getY() != posicionHormiguero.getY()) { //Distinta posición al hormiguero
-                hormigas_agregadas += 1; //El intento es exitoso así que aumento las hormigas agregadas.
+                hormigasObreras_agregadas += 1; //El intento es exitoso así que aumento las hormigas agregadas.
                 /*
                 Creo una nueva HormigaObrera con un id y una Posicion (la posicion es la generada anteriormente)
                  */
-                String idHormiga = "Hormiga_" + hormigas_agregadas;
+                String idHormiga = "Hormiga_" + hormigasObreras_agregadas;
                 HormigaObrera obrera = new HormigaObrera(idHormiga, intentoHormiga, this);
                 this.hormigas.put(idHormiga,obrera);
                 obrera.start(); //Se inicia el hilo en la clase Hormiga
+            }
+        }
+
+        int hormigasTrabajadoras_agregadas = 0;
+        while (hormigasTrabajadoras_agregadas < NUMERO_TRABAJADORAS) {
+            Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
+            if (intentoHormiga.getX() != posicionHormiguero.getX() && intentoHormiga.getY() != posicionHormiguero.getY()) {
+                hormigasTrabajadoras_agregadas += 1;
+                String idHormiga = "Hormiga_T_" + hormigasTrabajadoras_agregadas;
+                HormigaTrabajadora trabajadora = new HormigaTrabajadora(idHormiga, intentoHormiga, this);
+                this.hormigas.put(idHormiga,trabajadora);
+                trabajadora.start();
             }
         }
     }
@@ -94,27 +107,37 @@ public class SimuladorColoniaHormigas {
      */
     public synchronized void moverHormigaAleatoriamente(Hormiga hormiga) {
         boolean movimiento_posible = false;
+
         while (!movimiento_posible) {
             int direccion = this.random.nextInt(4); //Genera un número entre 0-3
             int deltaY = DIRECCIONES[direccion][0]; // En DIRECCIONES[][] el elemento[n][0] corresponde a movimiento en eje X
             int deltaX = DIRECCIONES[direccion][1]; // En DIRECCIONES[][] el elemento[n][1] corresponde a movimiento en eje Y
-
             Posicion posicion = hormiga.getPosicion(); // Posición actual de la hormiga.
             Posicion nuevaPosicion = posicion.mover(deltaX, deltaY); // Pasamos las deltas a la función mover para generar nueva posición.
 
             /*
-            Comprueba que las coordenadas se encuentren en los límites del tablero llamando a dentroLimites()
-            Compara de forma individual los valores X y los valores Y de hormiguero y nueva posición, si al
-            menos uno de esos dos valores es distinto al otro, las posiciones de hormiguero y hormiga son distintas.
-            Si ambas comparaciones devuelven true, la hormiga se puede mover, si no, lo vuelve a intentar en la
-            próxima iteración de while().
+            Generar movimiento para la clase HormigaObrera.
+            Se mueve una casilla a la vez y no puede estar en la diagonal principal del mapa.
              */
-            if (this.mapa.dentroLimites(nuevaPosicion) && (this.mapa.getHormiguero().getX() != nuevaPosicion.getX() || this.mapa.getHormiguero().getY() != nuevaPosicion.getY())) {
-                hormiga.setPosicion(nuevaPosicion);
-                movimiento_posible = true;
+            if (hormiga.getTipo() == TipoHormiga.OBRERA) {
+                if (this.mapa.dentroLimites(nuevaPosicion) && (this.mapa.getHormiguero().getX() != nuevaPosicion.getX() || this.mapa.getHormiguero().getY() != nuevaPosicion.getY())) {
+                    if (nuevaPosicion.getX() != nuevaPosicion.getY()) {
+                        hormiga.setPosicion(nuevaPosicion);
+                        movimiento_posible = true;
+                    }
+                }
+            }
+            /*
+            Generar movimiento para la clase HormigaTrabajadora.
+            Se mueve una casilla a la vez y no tiene restricciones de movimiento.
+             */
+            if (hormiga.getTipo() == TipoHormiga.TRABAJADORA) {
+                if (this.mapa.dentroLimites(nuevaPosicion) && (this.mapa.getHormiguero().getX() != nuevaPosicion.getX() || this.mapa.getHormiguero().getY() != nuevaPosicion.getY())) {
+                    hormiga.setPosicion(nuevaPosicion);
+                    movimiento_posible = true;
+                }
             }
         }
-
     }
 
     /**

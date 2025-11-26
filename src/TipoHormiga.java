@@ -1,5 +1,6 @@
 public enum TipoHormiga {
     OBRERA("O","Hormiga obrera"),
+    TRABAJADORA("T","Hormiga trabajadora"),
     GUERRERA("G", "Hormiga guerrera"),
     REINA ("R","Hormiga reina");
 
