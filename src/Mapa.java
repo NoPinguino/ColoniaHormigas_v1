@@ -1,8 +1,8 @@
 import java.util.HashMap;
 
 public class Mapa {
-    public static final int ANCHO = 4;
-    public static final int ALTO = 4;
+    public static final int ANCHO = 9;
+    public static final int ALTO = 9;
     private final Posicion hormiguero;
     private final char[][] mapa;
     public static final char VACIO = '*';
@@ -46,6 +46,16 @@ public class Mapa {
      */
     public boolean dentroLimites(Posicion posicion) {
         return posicion.dentroLimites(ANCHO - 1,ALTO - 1);
+    }
+
+    /**
+     * Comprueba que una posición no esté alejada más de dos casillas del hormiguero.
+     * Big O(1)
+     * @param posicion recibe una posicion con sus coordenadas X e Y
+     * @return Devuelve lo que recibe la posición dentroLimitesNostalgica(), siendo un boolean true/false.
+     */
+    public boolean dentroLimitesNostalgica(Posicion posicion) {
+        return (posicion.getX() >= hormiguero.getX() - 2 && posicion.getX() <= hormiguero.getX() + 2) && (posicion.getY() >= hormiguero.getY() - 2 && posicion.getY() <= hormiguero.getY() + 2);
     }
 
     /**

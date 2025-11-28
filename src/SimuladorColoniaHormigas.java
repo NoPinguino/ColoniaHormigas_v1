@@ -2,8 +2,10 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class SimuladorColoniaHormigas {
-    private static final int NUMERO_OBRERAS = 3;
-    private static final int NUMERO_TRABAJADORAS = 2;
+    private static final int NUMERO_OBRERAS = 1;
+    private static final int NUMERO_TRABAJADORAS = 1;
+    private static final int NUMERO_GUARDIANAS = 2;
+    private static final int NUMERO_NOSTALGICAS = 2;
     private static final int INTERVALO_ACTUALIZACION = 1500;
     private static final int[][] DIRECCIONES = {
             {1,0},  //Abajo
@@ -36,12 +38,12 @@ public class SimuladorColoniaHormigas {
         int hormigasObreras_agregadas = 0;
         while (hormigasObreras_agregadas < NUMERO_OBRERAS) {
             Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
-            if (intentoHormiga.getX() != posicionHormiguero.getX() && intentoHormiga.getY() != posicionHormiguero.getY()) { //Distinta posición al hormiguero
+            if (this.mapa.dentroLimites(intentoHormiga)) { //Distinta posición al hormiguero
                 hormigasObreras_agregadas += 1; //El intento es exitoso así que aumento las hormigas agregadas.
                 /*
                 Creo una nueva HormigaObrera con un id y una Posicion (la posicion es la generada anteriormente)
                  */
-                String idHormiga = "Hormiga_" + hormigasObreras_agregadas;
+                String idHormiga = "Hormiga_O_" + hormigasObreras_agregadas;
                 HormigaObrera obrera = new HormigaObrera(idHormiga, intentoHormiga, this);
                 this.hormigas.put(idHormiga,obrera);
                 obrera.start(); //Se inicia el hilo en la clase Hormiga
@@ -51,12 +53,36 @@ public class SimuladorColoniaHormigas {
         int hormigasTrabajadoras_agregadas = 0;
         while (hormigasTrabajadoras_agregadas < NUMERO_TRABAJADORAS) {
             Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
-            if (intentoHormiga.getX() != posicionHormiguero.getX() && intentoHormiga.getY() != posicionHormiguero.getY()) {
+            if (this.mapa.dentroLimites(intentoHormiga)) {
                 hormigasTrabajadoras_agregadas += 1;
                 String idHormiga = "Hormiga_T_" + hormigasTrabajadoras_agregadas;
                 HormigaTrabajadora trabajadora = new HormigaTrabajadora(idHormiga, intentoHormiga, this);
                 this.hormigas.put(idHormiga,trabajadora);
                 trabajadora.start();
+            }
+        }
+
+        int hormigasGuardianas_agregadas = 0;
+        while (hormigasGuardianas_agregadas < NUMERO_GUARDIANAS) {
+            Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
+            if (this.mapa.dentroLimites(intentoHormiga)) {
+                hormigasGuardianas_agregadas += 1;
+                String idHormiga = "Hormiga_G_" + hormigasGuardianas_agregadas;
+                HormigaGuardiana guardiana = new HormigaGuardiana(idHormiga, intentoHormiga, this);
+                this.hormigas.put(idHormiga,guardiana);
+                guardiana.start();
+            }
+        }
+
+        int hormigasNostalgicas_agregadas = 0;
+        while (hormigasNostalgicas_agregadas < NUMERO_NOSTALGICAS) {
+            Posicion intentoHormiga = new Posicion(this.random.nextInt(Mapa.ANCHO),this.random.nextInt(Mapa.ALTO));
+            if (this.mapa.dentroLimitesNostalgica(intentoHormiga)) {
+                hormigasNostalgicas_agregadas += 1;
+                String idHormiga = "Hormiga_N_" + hormigasNostalgicas_agregadas;
+                HormigaNostalgica nostalgica = new HormigaNostalgica(idHormiga, intentoHormiga, this);
+                this.hormigas.put(idHormiga,nostalgica);
+                nostalgica.start();
             }
         }
     }
@@ -137,6 +163,30 @@ public class SimuladorColoniaHormigas {
                     movimiento_posible = true;
                 }
             }
+            /*
+            Generar movimiento para la clase HormigaGuardiana.
+            Se mueve una casilla a la vez y solo se mueve en el eje Y.
+            */
+            if (hormiga.getTipo() == TipoHormiga.GUARDIANA) {
+                if (this.mapa.dentroLimites(nuevaPosicion) && (this.mapa.getHormiguero().getX() != nuevaPosicion.getX() || this.mapa.getHormiguero().getY() != nuevaPosicion.getY())) {
+                    if (nuevaPosicion.getX() == hormiga.getPosicion().getX()) {
+                        hormiga.setPosicion(nuevaPosicion);
+                        movimiento_posible = true;
+                    }
+                }
+            }
+            /*
+            Generar movimiento para la clase HormigaNostalgica.
+            Se mueve una casilla a la vez y no se puede alejar más de dos casillas del hormiguero.
+            */
+            if (hormiga.getTipo() == TipoHormiga.NOSTALGICA) {
+                if (this.mapa.dentroLimites(nuevaPosicion) && (this.mapa.getHormiguero().getX() != nuevaPosicion.getX() || this.mapa.getHormiguero().getY() != nuevaPosicion.getY())) {
+                    if (this.mapa.dentroLimitesNostalgica(nuevaPosicion)) {
+                        hormiga.setPosicion(nuevaPosicion);
+                        movimiento_posible = true;
+                    }
+                }
+            }
         }
     }
 
@@ -155,18 +205,28 @@ public class SimuladorColoniaHormigas {
      * Big O(n) n=cantidad de hormigas
      */
     public void mostrarEstadisticas() {
-        int hormigas_activas = 0;
         int hormigas_obreras = 0;
+        int hormigas_trabajadoras = 0;
+        int hormigas_guardianas = 0;
+        int hormigas_nostalgicas = 0;
+
         for (Hormiga hormiga : hormigas.values()) {
-            if (hormiga.isActiva()) hormigas_activas++;
-            if (hormiga.getTipo() == TipoHormiga.OBRERA) hormigas_obreras++;
+            switch (hormiga.getTipo()) {
+                case OBRERA -> hormigas_obreras++;
+                case TRABAJADORA -> hormigas_trabajadoras++;
+                case GUARDIANA -> hormigas_guardianas++;
+                case NOSTALGICA -> hormigas_nostalgicas++;
+            }
         }
 
         System.out.println("======================================");
         System.out.println("Estadísticas de la simulación: ");
         System.out.println("======================================");
-        System.out.println("Hormigas activas: " + hormigas_activas);
+        System.out.println("Hormigas activas: " + hormigas.size());
         System.out.println("Hormigas obreras: " + hormigas_obreras);
+        System.out.println("Hormigas trabajadoras: " + hormigas_trabajadoras);
+        System.out.println("Hormigas guardianas: " + hormigas_guardianas);
+        System.out.println("Hormigas nostálgicas: " + hormigas_nostalgicas);
         System.out.println("Posición hormiguero: " + mapa.getHormiguero().getX() + " " + mapa.getHormiguero().getY() + ".");
         System.out.println("Intervalo entre ejecuciones: " + INTERVALO_ACTUALIZACION + "ms.");
     }

@@ -1,8 +1,8 @@
 public enum TipoHormiga {
     OBRERA("O","Hormiga obrera"),
     TRABAJADORA("T","Hormiga trabajadora"),
-    GUERRERA("G", "Hormiga guerrera"),
-    REINA ("R","Hormiga reina");
+    GUARDIANA("G", "Hormiga guardiana"),
+    NOSTALGICA ("N","Hormiga nostalgica");
 
     private final String simbolo;
     private final String nombre;
